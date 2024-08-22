@@ -2,6 +2,7 @@
 {
     public enum TokenEnum
     {
+        NONE = -2,
         EOF = -1,
         NEWLINE = 0,
         NUMBER = 1,

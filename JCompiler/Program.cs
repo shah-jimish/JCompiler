@@ -6,7 +6,7 @@ public class Program
 {
     public static void Main()
     {
-        string source = "+- */=+==";
+        string source = "IF+-123 foo*THEN/";
         Lexer lexer = new(source);
         Token token = lexer.GetToken();
         while (token.tokenKind != TokenEnum.EOF)
