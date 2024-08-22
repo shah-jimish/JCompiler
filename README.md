@@ -1,1 +1,2 @@
-# Compiler which convert BASIC code to C code.
+# Compiler 
+Convert BASIC code to C.
