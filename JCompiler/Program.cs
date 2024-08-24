@@ -1,18 +1,36 @@
-﻿using JCompiler;
-using JCompiler.Helper.Token;
+﻿using JCompiler.Helper.Token;
 using JCompiler.TLE;
 
-public class Program
+namespace JCompiler
 {
-    public static void Main()
+    public class Program
     {
-        string source = "IF+-123 foo*THEN/";
-        Lexer lexer = new(source);
-        Token token = lexer.GetToken();
-        while (token.tokenKind != TokenEnum.EOF)
+        public static void Main(string[] args)
         {
-            Console.WriteLine(token.tokenKind);
-            token = lexer.GetToken();
+            args[0] = "code.jimish";
+            if (args.Length != 1)
+            {
+                Console.WriteLine("Error: Compiler needs source file as argument.");
+                Environment.Exit(1);
+            }
+            string source = "";
+            try
+            {
+                using (StreamReader inputFile = new(args[0]))
+                {
+                    source = inputFile.ReadToEnd();
+                }
+                Lexer lexer = new(source);
+                Parser parse = new(lexer);
+                parse.Program(); //Start the parser.
+                Console.WriteLine("Parsing completed.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+                Environment.Exit(1);
+                return;
+            }
         }
     }
 }
