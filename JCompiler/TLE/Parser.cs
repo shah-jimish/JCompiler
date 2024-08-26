@@ -27,6 +27,7 @@ namespace JCompiler.TLE
         {
             return tokenKind == peekToken.tokenKind;
         }
+
         //match current token , if not then advances the current token
         public void Match(TokenEnum tokenKind)
         {
@@ -89,7 +90,7 @@ namespace JCompiler.TLE
                 Comparasion();
                 Match(TokenEnum.THEN);
                 NewLine();
-                while (CheckToken(TokenEnum.ENDIF))
+                while (!CheckToken(TokenEnum.ENDIF))
                 {
                     Statement();
                 }
@@ -142,7 +143,7 @@ namespace JCompiler.TLE
             //this is not a valid statement Error!
             else
             {
-                Abort("Invalid statement at "+curToken.tokenSText +" ("+curToken.tokenKind.ToString()+")");
+                Abort("Invalid statement at " + curToken.tokenSText + " (" + curToken.tokenKind.ToString() + ")");
             }
             NewLine();
         }
@@ -163,14 +164,76 @@ namespace JCompiler.TLE
         public void Expression()
         {
             Console.WriteLine("EXPRESSION");
+            Term();
+            while (CheckToken(TokenEnum.PLUS) || CheckToken(TokenEnum.MINUS))
+            {
+                NextToken();
+                Term();
+            }
         }
-        
+
         //comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
         public void Comparasion()
         {
             Console.WriteLine("COMPARISON");
             Expression();
-            //if()
+            // Must be at least one comparison operator and another expression.
+            if (IsComparisonOperator())
+            {
+                NextToken();
+                Expression();
+            }
+            else
+            {
+                Abort("Expected comparison operator at: " + curToken.ToString());
+            }
+            while (IsComparisonOperator())
+            {
+                NextToken();
+                Expression();
+            }
+        }
+        //Return true if the current token is a comparison operator.
+        public bool IsComparisonOperator()
+        {
+            return CheckToken(TokenEnum.GT) || CheckToken(TokenEnum.GTEQ) ||
+                    CheckToken(TokenEnum.LT) || CheckToken(TokenEnum.LTEQ) ||
+                    CheckToken(TokenEnum.EQEQ) || CheckToken(TokenEnum.NOTEQ);
+        }
+        //term ::= unary {( "/" | "*" ) unary}
+        public void Term()
+        {
+            Console.WriteLine("TERM");
+            Unary();
+            //can have 0 or more *// and expression
+            while (CheckToken(TokenEnum.ASTERISK) || CheckToken(TokenEnum.SLASH))
+            {
+                NextToken();
+                Unary();
+            }
+        }
+        // unary ::= ["+" | "-"] primary
+        public void Unary()
+        {
+            Console.WriteLine("UNARY");
+            if (CheckToken(TokenEnum.PLUS) || CheckToken(TokenEnum.MINUS))
+            {
+                NextToken();
+            }
+            Primary();
+        }
+        //primary ::= number | ident
+        public void Primary()
+        {
+            Console.WriteLine("PRIMARY (" + curToken.tokenSText.ToString() + ")");
+            if (CheckToken(TokenEnum.NUMBER) || CheckToken(TokenEnum.IDENT))
+            {
+                NextToken();
+            }
+            else
+            {
+                Abort("Unexpected token at " + curToken.ToString());
+            }
         }
     }
 }
