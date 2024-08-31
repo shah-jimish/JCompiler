@@ -1,5 +1,4 @@
 ﻿using JCompiler.Helper.Token;
-using System.Security.Cryptography.X509Certificates;
 
 namespace JCompiler.TLE
 {
@@ -7,11 +6,20 @@ namespace JCompiler.TLE
     public class Parser
     {
         private readonly Lexer lexer;
+        private readonly Emitter emitter;
         Token curToken;
         Token peekToken;
-        public Parser(Lexer lexer)
+        HashSet<string> symbols;
+        HashSet<string> labelsDeclared;
+        HashSet<string> labelsGotoed;
+        public Parser(Lexer lexer,Emitter emitter)
         {
             this.lexer = lexer;
+            this.emitter = emitter;
+            symbols = [];
+            labelsDeclared = [];
+            labelsGotoed = [];
+
             curToken = null;
             peekToken = null;
             NextToken();
@@ -56,6 +64,27 @@ namespace JCompiler.TLE
         //program ::= {statement}
         public void Program()
         {
+            emitter.HeaderLine("#include<stdio.h>");
+            emitter.HeaderLine("int main(void){");
+            //since some newlines are required in our grammer , need to skip the excess
+            while (CheckToken(TokenEnum.NEWLINE))
+            {
+                NextToken();
+            }
+            //parse all the statement in the program
+            while (!CheckToken(TokenEnum.EOF))
+            {
+                Statement();
+            }
+            emitter.EmitLine("return 0;");
+            emitter.EmitLine("}");
+            foreach(var label in labelsGotoed)
+            {
+                if (!labelsDeclared.Contains(label))
+                {
+                    Abort("Attempting to GOTO to undeclared label: " + label);
+                }
+            }
             Console.WriteLine("PROGRAM");
             while (!CheckToken(TokenEnum.EOF))
             {
@@ -73,13 +102,16 @@ namespace JCompiler.TLE
                 NextToken();
                 if (CheckToken(TokenEnum.STRING))
                 {
-                    //simple string
+                    //simple string so print it
+                    emitter.HeaderLine("printf(\""+ curToken.tokenSText + "\\n\");");
                     NextToken();
                 }
                 else
                 {
-                    //Except an expression
+                    //Except an expression and print result as floar
+                    emitter.Emit("printf(\"%" + ".2f\\n\", (float)(");
                     Expression();
+                    emitter.EmitLine("));");
                 }
             }
             // "IF" comparison "THEN" nl {statement} "ENDIF" nl

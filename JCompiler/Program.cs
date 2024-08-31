@@ -20,8 +20,10 @@ namespace JCompiler
                     source = inputFile.ReadToEnd();
                 }
                 Lexer lexer = new(source);
-                Parser parse = new(lexer);
+                Emitter emitter = new("out.c");
+                Parser parse = new(lexer,emitter);
                 parse.Program(); //Start the parser.
+                emitter.WriteFile(); //write the output to the file
                 Console.WriteLine("Parsing completed.");
             }
             catch (Exception ex)
