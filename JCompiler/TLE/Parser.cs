@@ -12,7 +12,7 @@ namespace JCompiler.TLE
         HashSet<string> symbols;
         HashSet<string> labelsDeclared;
         HashSet<string> labelsGotoed;
-        public Parser(Lexer lexer,Emitter emitter)
+        public Parser(Lexer lexer, Emitter emitter)
         {
             this.lexer = lexer;
             this.emitter = emitter;
@@ -78,7 +78,7 @@ namespace JCompiler.TLE
             }
             emitter.EmitLine("return 0;");
             emitter.EmitLine("}");
-            foreach(var label in labelsGotoed)
+            foreach (var label in labelsGotoed)
             {
                 if (!labelsDeclared.Contains(label))
                 {
@@ -103,12 +103,12 @@ namespace JCompiler.TLE
                 if (CheckToken(TokenEnum.STRING))
                 {
                     //simple string so print it
-                    emitter.HeaderLine("printf(\""+ curToken.tokenSText + "\\n\");");
+                    emitter.EmitLine("printf(\"" + curToken.tokenText.ToString() + "\\n\");");
                     NextToken();
                 }
                 else
                 {
-                    //Except an expression and print result as floar
+                    //Except an expression and print result as float
                     emitter.Emit("printf(\"%" + ".2f\\n\", (float)(");
                     Expression();
                     emitter.EmitLine("));");
@@ -119,14 +119,17 @@ namespace JCompiler.TLE
             {
                 Console.WriteLine("STATEMENT-IF");
                 NextToken();
+                emitter.Emit("if(");
                 Comparasion();
                 Match(TokenEnum.THEN);
                 NewLine();
+                emitter.EmitLine("){");
                 while (!CheckToken(TokenEnum.ENDIF))
                 {
                     Statement();
                 }
                 Match(TokenEnum.ENDIF);
+                emitter.EmitLine("}");
             }
 
             //"WHILE" comparison "REPEAT" nl {statement nl} "ENDWHILE" nl
@@ -134,19 +137,30 @@ namespace JCompiler.TLE
             {
                 Console.WriteLine("STATEMENT-WHILE");
                 NextToken();
+                emitter.Emit("while(");
                 Comparasion();
                 Match(TokenEnum.REPEAT);
+                NewLine();
+                emitter.EmitLine("){");
                 while (!CheckToken(TokenEnum.ENDWHILE))
                 {
                     Statement();
                 }
                 Match(TokenEnum.ENDWHILE);
+                emitter.EmitLine("}");
             }
-            //"LABEL" ident nl
+            //"LABEL" ident
             else if (CheckToken(TokenEnum.LABEL))
             {
                 Console.WriteLine("STATEMENT-LABEL");
                 NextToken();
+                //make sure the label does not exists
+                if (labelsDeclared.Contains(curToken.tokenText.ToString()))
+                {
+                    Abort("Label already exists: " + curToken.tokenText.ToString());
+                }
+                labelsDeclared.Add(curToken.tokenText.ToString());
+                emitter.EmitLine(curToken.tokenText.ToString() + ":");
                 Match(TokenEnum.IDENT);
             }
             //"GOTO" ident nl
@@ -154,6 +168,8 @@ namespace JCompiler.TLE
             {
                 Console.WriteLine("STATEMENT-GOTO");
                 NextToken();
+                labelsGotoed.Add(curToken.tokenText.ToString());
+                emitter.EmitLine("goto " + curToken.tokenText.ToString() + ";");
                 Match(TokenEnum.IDENT);
             }
             //"LET" ident "=" expression nl
@@ -161,21 +177,35 @@ namespace JCompiler.TLE
             {
                 Console.WriteLine("STATEMENT-LET");
                 NextToken();
+                if (!symbols.Contains(curToken.tokenText.ToString()))
+                {
+                    symbols.Add(curToken.tokenText.ToString());
+                    emitter.HeaderLine("float " + curToken.tokenText.ToString() + ";");
+                }
+                emitter.Emit(curToken.tokenText.ToString() + "=");
                 Match(TokenEnum.IDENT);
                 Match(TokenEnum.EQ);
                 Expression();
+                emitter.EmitLine(";");
             }
             //"INPUT" ident
             else if (CheckToken(TokenEnum.INPUT))
             {
                 Console.WriteLine("STATEMENT-INPUT");
                 NextToken();
+                if (!symbols.Contains(curToken.tokenText.ToString()))
+                {
+                    emitter.HeaderLine("float " + curToken.tokenText.ToString() + ";");
+                }
+                emitter.EmitLine("if(0 == scanf(\"%"+"f\",&"+curToken.tokenText.ToString() + "(( {");
+                emitter.EmitLine(curToken.tokenText.ToString() + " = 0;");
+                emitter.Emit("scanf");
                 Match(TokenEnum.IDENT);
             }
             //this is not a valid statement Error!
             else
             {
-                Abort("Invalid statement at " + curToken.tokenSText + " (" + curToken.tokenKind.ToString() + ")");
+                Abort("Invalid statement at " + curToken.tokenText.ToString() + " (" + curToken.tokenKind.ToString() + ")");
             }
             NewLine();
         }
@@ -257,7 +287,7 @@ namespace JCompiler.TLE
         //primary ::= number | ident
         public void Primary()
         {
-            Console.WriteLine("PRIMARY (" + curToken.tokenSText.ToString() + ")");
+            Console.WriteLine("PRIMARY (" + curToken.tokenText.ToString() + ")");
             if (CheckToken(TokenEnum.NUMBER) || CheckToken(TokenEnum.IDENT))
             {
                 NextToken();

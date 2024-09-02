@@ -73,32 +73,32 @@ namespace JCompiler
             {
                 case '+':
                     {
-                        token = new(curChar, TokenEnum.PLUS);
+                        token = new(curChar.ToString(), TokenEnum.PLUS);
                         break;
                     }
                 case '-':
                     {
-                        token = new(curChar, TokenEnum.MINUS);
+                        token = new(curChar.ToString(), TokenEnum.MINUS);
                         break;
                     }
                 case '*':
                     {
-                        token = new(curChar, TokenEnum.ASTERISK);
+                        token = new(curChar.ToString(), TokenEnum.ASTERISK);
                         break;
                     }
                 case '/':
                     {
-                        token = new(curChar, TokenEnum.SLASH);
+                        token = new(curChar.ToString(), TokenEnum.SLASH);
                         break;
                     }
                 case '\n':
                     {
-                        token = new(curChar, TokenEnum.NEWLINE);
+                        token = new(curChar.ToString(), TokenEnum.NEWLINE);
                         break;
                     }
                 case '\0':
                     {
-                        token = new(curChar, TokenEnum.EOF);
+                        token = new(curChar.ToString(), TokenEnum.EOF);
                         break;
                     }
                 case '=':
@@ -111,7 +111,7 @@ namespace JCompiler
                         }
                         else
                         {
-                            token = new(curChar, TokenEnum.EQ);
+                            token = new(curChar.ToString(), TokenEnum.EQ);
                         }
                         break;
                     }
@@ -125,7 +125,7 @@ namespace JCompiler
                         }
                         else
                         {
-                            token = new(curChar, TokenEnum.GT);
+                            token = new(curChar.ToString(), TokenEnum.GT);
                         }
                         break;
                     }
@@ -133,13 +133,13 @@ namespace JCompiler
                     {
                         if (Peek() == '=')
                         {
-                            char lastChar = curChar;
+                            string lastChar = curChar.ToString();
                             NextChar();
                             token = new("" + lastChar + curChar, TokenEnum.LTEQ);
                         }
                         else
                         {
-                            token = new(curChar, TokenEnum.LT);
+                            token = new(curChar.ToString(), TokenEnum.LT);
                         }
                         break;
                     }
@@ -172,7 +172,7 @@ namespace JCompiler
                             }
                             NextChar();
                         }
-                        string tokenText = source.Substring(startPos, curPosition - startPos + 1);
+                        string tokenText = source.Substring(startPos, curPosition - startPos);
                         token = new(tokenText, TokenEnum.STRING);
                         break;
                     }

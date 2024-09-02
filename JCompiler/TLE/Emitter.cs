@@ -17,20 +17,20 @@ namespace JCompiler.TLE
 
         public void Emit(string code)
         {
-            if (code == null) throw new ArgumentNullException(nameof(code));
+            ArgumentNullException.ThrowIfNull(code);
             codes.Append(code);
         }
 
         public void EmitLine(string code)
         {
-            if (code == null) throw new ArgumentNullException(nameof(code));
-            codes.AppendLine(code);
+            ArgumentNullException.ThrowIfNull(code);
+            codes.AppendLine(code + '\n');
         }
 
         public void HeaderLine(string code)
         {
-            if (code == null) throw new ArgumentNullException(nameof(code));
-            header.AppendLine(code);
+            ArgumentNullException.ThrowIfNull(code);
+            header.AppendLine(code + '\n');
         }
 
         public void WriteFile()
@@ -39,8 +39,7 @@ namespace JCompiler.TLE
             {
                 using (var writer = new StreamWriter(fullPath, false, Encoding.UTF8))
                 {
-                    writer.Write(header.ToString());
-                    writer.Write(codes.ToString());
+                    writer.Write(header.ToString() + codes.ToString());
                 }
             }
             catch (Exception ex)
