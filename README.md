@@ -1,67 +1,62 @@
 # Compiler 
-Welcome to my repo!
-I am working on a compiler that converts BASIC to C why you ask cause I am psycho...................
+Welcome to my repo! <br>
+I am working on a compiler that converts BASIC to C <br>
 
-BASIC code:
-PRINT "How many fibonacci numbers do you want?"
-INPUT nums
-PRINT ""
+BASIC code:<br>
+<br>
+LET a = 0<br>
+WHILE a < 1 REPEAT<br>
+    PRINT "Enter number of scores: "<br>
+    INPUT a<br>
+ENDWHILE<br>
 
-LET a = 0
-LET b = 1
-WHILE nums > 0 REPEAT
-    PRINT a
-    LET c = a + b
-    LET a = b
-    LET b = c
-    LET nums = nums - 1
-ENDWHILE
+LET b = 0<br>
+LET s = 0<br>
+PRINT "Enter one value at a time: "<br>
+WHILE b < a REPEAT<br>
+    INPUT c<br>
+    LET s = s + c<br>
+    LET b = b + 1<br>
+ENDWHILE<br>
 
-Compiler-generated code:
+PRINT "Average: "<br>
+PRINT s / a<br>
 
-#include<stdio.h>
+Compiler-generated code:<br>
 
-int main(void){
+#include<stdio.h><br>
+int main(void){<br>
+float a;<br>
+float b;<br>
+float s;<br>
+float c;<br>
+a=0;<br>
+while(a<1){<br>
+printf("Enter number of scores: \n");<br>
+if(0 == scanf("%f",&a)) {<br>
+a = 0;<br>
+scanf("%*s");<br>
+}<br>
+}<br>
+b=0;<br>
+s=0;<br>
+printf("Enter one value at a time: \n");<br>
+while(b<a){<br>
+if(0 == scanf("%f",&c)) {<br>
+c = 0;<br>
+scanf("%*s");<br>
+}<br>
+s=s+c;<br>
+b=b+1;<br>
+}<br>
+printf("Average: \n");<br>
+printf("%.2f\n", (float)(s/a));<br>
+printf("Press Enter to exit...\n");<br>
+getchar();<br>
+getchar();<br>
+return 0;<br>
+}<br>
 
-float nums;
-
-float a;
-
-float b;
-
-float c;
-
-float nums;
-
-printf("How many fibonacci numbers do you want?\n");
-
-if(0 == scanf("%f",&nums(( {
-
-nums = 0;
-
-scanfprintf("\n");
-
-a=;
-
-b=;
-
-while(){
-
-printf("%.2f\n", (float)());
-
-c=;
-
-a=;
-
-b=;
-
-nums=;
-
-}
-
-return 0;
-
-}
 
 I know not perfect but working on it.
 
