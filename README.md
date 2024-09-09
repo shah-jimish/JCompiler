@@ -6,17 +6,17 @@ BASIC code:<br>
 <br>
 LET a = 0<br>
 WHILE a < 1 REPEAT<br>
-    \tPRINT "Enter number of scores: "<br>
-    \tINPUT a<br>
+    &emsp;PRINT "Enter number of scores: "<br>
+    &emsp;INPUT a<br>
 ENDWHILE<br>
 
 LET b = 0<br>
 LET s = 0<br>
 PRINT "Enter one value at a time: "<br>
 WHILE b < a REPEAT<br>
-    \tINPUT c<br>
-    \tLET s = s + c<br>
-    \tLET b = b + 1<br>
+    &emsp;INPUT c<br>
+    &emsp;LET s = s + c<br>
+    &emsp;LET b = b + 1<br>
 ENDWHILE<br>
 
 PRINT "Average: "<br>
