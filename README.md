@@ -58,5 +58,11 @@ return 0;<br>
 }<br>
 
 
-I know not perfect but working on it.
-
+Setup : <br>
+--install gcc compiler
+<br>
+Optional:<br>
+-- Try to keep this on c drive so you won't face any access issues.
+<br>
+<br>
+Peace
