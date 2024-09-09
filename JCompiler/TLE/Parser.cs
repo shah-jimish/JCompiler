@@ -1,4 +1,5 @@
 ﻿using JCompiler.Helper.Token;
+using System.Diagnostics;
 
 namespace JCompiler.TLE
 {
@@ -76,19 +77,22 @@ namespace JCompiler.TLE
             {
                 Statement();
             }
+            emitter.EmitLine("printf(\"Press Enter to exit...\\n\");");
+            emitter.EmitLine("getchar();"); // This will capture the newline character from the last input
+            emitter.EmitLine("getchar();");
             emitter.EmitLine("return 0;");
             emitter.EmitLine("}");
+            Console.WriteLine("PROGRAM");
+            while (!CheckToken(TokenEnum.EOF))
+            {
+                Statement();
+            }
             foreach (var label in labelsGotoed)
             {
                 if (!labelsDeclared.Contains(label))
                 {
                     Abort("Attempting to GOTO to undeclared label: " + label);
                 }
-            }
-            Console.WriteLine("PROGRAM");
-            while (!CheckToken(TokenEnum.EOF))
-            {
-                Statement();
             }
         }
         //one of the following statements...
@@ -195,11 +199,14 @@ namespace JCompiler.TLE
                 NextToken();
                 if (!symbols.Contains(curToken.tokenText.ToString()))
                 {
+                    symbols.Add(curToken.tokenText.ToString());
                     emitter.HeaderLine("float " + curToken.tokenText.ToString() + ";");
                 }
-                emitter.EmitLine("if(0 == scanf(\"%"+"f\",&"+curToken.tokenText.ToString() + "(( {");
+                emitter.EmitLine("if(0 == scanf(\"%" + "f\",&" + curToken.tokenText.ToString() + ")) {");
                 emitter.EmitLine(curToken.tokenText.ToString() + " = 0;");
-                emitter.Emit("scanf");
+                emitter.Emit("scanf(\"%");
+                emitter.EmitLine("*s\");");
+                emitter.EmitLine("}");
                 Match(TokenEnum.IDENT);
             }
             //this is not a valid statement Error!
@@ -227,8 +234,10 @@ namespace JCompiler.TLE
         {
             Console.WriteLine("EXPRESSION");
             Term();
+            //Can have 0 or more +/- and expressions.
             while (CheckToken(TokenEnum.PLUS) || CheckToken(TokenEnum.MINUS))
             {
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
                 Term();
             }
@@ -242,6 +251,7 @@ namespace JCompiler.TLE
             // Must be at least one comparison operator and another expression.
             if (IsComparisonOperator())
             {
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
                 Expression();
             }
@@ -249,8 +259,10 @@ namespace JCompiler.TLE
             {
                 Abort("Expected comparison operator at: " + curToken.ToString());
             }
+            //Can have 0 or more comparison operator and expressions.
             while (IsComparisonOperator())
             {
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
                 Expression();
             }
@@ -270,6 +282,7 @@ namespace JCompiler.TLE
             //can have 0 or more *// and expression
             while (CheckToken(TokenEnum.ASTERISK) || CheckToken(TokenEnum.SLASH))
             {
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
                 Unary();
             }
@@ -278,8 +291,10 @@ namespace JCompiler.TLE
         public void Unary()
         {
             Console.WriteLine("UNARY");
+            //Optional unary +/-
             if (CheckToken(TokenEnum.PLUS) || CheckToken(TokenEnum.MINUS))
             {
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
             }
             Primary();
@@ -288,13 +303,24 @@ namespace JCompiler.TLE
         public void Primary()
         {
             Console.WriteLine("PRIMARY (" + curToken.tokenText.ToString() + ")");
-            if (CheckToken(TokenEnum.NUMBER) || CheckToken(TokenEnum.IDENT))
+            if (CheckToken(TokenEnum.NUMBER))
             {
+                emitter.Emit(curToken.tokenText.ToString());
+                NextToken();
+            }
+            else if (CheckToken(TokenEnum.IDENT))
+            {
+                //Ensure the variable already exists.
+                if (!symbols.Contains(curToken.tokenText.ToString()))
+                {
+                    Abort("Referencing variable before assignment: " + curToken.tokenText.ToString());
+                }
+                emitter.Emit(curToken.tokenText.ToString());
                 NextToken();
             }
             else
             {
-                Abort("Unexpected token at " + curToken.ToString());
+                Abort("Unexpected token at " + curToken.tokenText.ToString());
             }
         }
     }
