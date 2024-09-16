@@ -21,7 +21,9 @@
         WHILE = 109,
         REPEAT = 110,
         ENDWHILE = 111,
-
+        NUMBERS = 112,
+        STRINGS = 113,
+        
         //Operators.
         EQ = 201,
         PLUS = 202,
@@ -34,5 +36,8 @@
         LTEQ = 209,
         GT = 210,
         GTEQ = 211,
+        SBO = 212,
+        SBC = 213,
+        COMMA = 214
     }
 }

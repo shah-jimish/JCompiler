@@ -8,13 +8,14 @@ namespace JCompiler
         public string source;
         public char curChar;
         public int curPosition;
-
-        public Lexer(string source)
+        private readonly Emitter emitter;
+        public Lexer(string source, Emitter emitter)
         {
             this.source = source + "\n"; // Source code to lex as a string. Append a newline to simplify lexing/parsing the last token/statement.
             curChar = '\0';              // Initialize the current character.
             curPosition = -1;            // Initialize the current position.
             NextChar();                  // Call NextChar to set the first character.
+            this.emitter = emitter;
         }
 
         //process the next character
@@ -223,6 +224,23 @@ namespace JCompiler
                         {
                             token = new(tokenText, keyword);
                         }
+                        break;
+                    }
+                case '[':
+                    {
+                        Console.WriteLine("inside the [");
+                        token = new(curChar.ToString(),TokenEnum.SBO);
+                        break;
+                    }
+                case ']':
+                    {
+                        Console.WriteLine("inside the ]");
+                        token = new(curChar.ToString(), TokenEnum.SBC);
+                        break;
+                    }
+                case ',':
+                    {
+                        token = new(curChar.ToString(), TokenEnum.COMMA);
                         break;
                     }
                 default:

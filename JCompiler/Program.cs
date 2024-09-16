@@ -20,8 +20,8 @@ namespace JCompiler
                 {
                     source = inputFile.ReadToEnd();
                 }
-                Lexer lexer = new(source);
                 Emitter emitter = new("out.c");
+                Lexer lexer = new(source,emitter);
                 Parser parse = new(lexer, emitter);
                 parse.Program(); //Start the parser.
                 emitter.WriteFile(); //write the output to the file
@@ -33,7 +33,7 @@ namespace JCompiler
                     step 2 - run the `gcc out.c` command  --> it will generate e.exe file
                     step 3 - run a.exe 
                 */
-                RunGCCCompiler();
+                //RunGCCCompiler();
 
             }
             catch (Exception ex)

@@ -1,5 +1,5 @@
 ﻿using JCompiler.Helper.Token;
-using System.Diagnostics;
+using System.Text;
 
 namespace JCompiler.TLE
 {
@@ -46,7 +46,14 @@ namespace JCompiler.TLE
             }
             NextToken();
         }
-
+        public void MatchTwoToken(TokenEnum firstTokenKind,TokenEnum secondTokenKind)
+        {
+            if (!CheckToken(firstTokenKind) && !CheckToken(secondTokenKind))
+            {
+                Abort("Expected " + firstTokenKind.ToString()+" or "+ secondTokenKind.ToString() + ", got " + curToken.tokenKind.ToString());
+            }
+            NextToken();
+        }
         //Advance the current token
         public void NextToken()
         {
@@ -135,7 +142,6 @@ namespace JCompiler.TLE
                 Match(TokenEnum.ENDIF);
                 emitter.EmitLine("}");
             }
-
             //"WHILE" comparison "REPEAT" nl {statement nl} "ENDWHILE" nl
             else if (CheckToken(TokenEnum.WHILE))
             {
@@ -208,6 +214,58 @@ namespace JCompiler.TLE
                 emitter.EmitLine("*s\");");
                 emitter.EmitLine("}");
                 Match(TokenEnum.IDENT);
+            }
+            
+            //datatype[] ident "=" [1,2,3,4]
+            else if (CheckToken(TokenEnum.NUMBERS))
+            {
+                //[numbers]
+                //4) = 
+                //5) [
+                //6) value sepeated by commans ]
+                //[1,2,3,4,5]
+                Console.WriteLine("Array-statement");
+                NextToken();
+                if (!symbols.Contains(curToken.tokenText.ToString()))
+                {
+                    symbols.Add(curToken.tokenText.ToString());
+                    //int ident[] = {1,2,3,4};
+                    //in the second section i want the array 
+                    emitter.Emit("int " + curToken.tokenText.ToString()+"[] = ");
+                }
+                //ident[]
+                Match(TokenEnum.IDENT);
+                Match(TokenEnum.EQ);
+                Match(TokenEnum.SBO);
+                StringBuilder sb = new();
+                sb.Append("{");
+                sb.Append(curToken.tokenText.ToString());
+                MatchTwoToken(TokenEnum.IDENT,TokenEnum.NUMBER);
+                while (!CheckToken(TokenEnum.SBC))
+                {
+                    NextToken();
+                    sb.Append(",");
+                    sb.Append(curToken.tokenText.ToString());
+                    var t = curToken.tokenKind.ToString();
+                    if (curToken.tokenKind == TokenEnum.IDENT)
+                    {
+                        if (!symbols.Contains(curToken.tokenText.ToString()))
+                        {
+                            Abort("Invalid statement at " + curToken.tokenText.ToString() + " (" + curToken.tokenKind.ToString() + ")");
+                        }
+                    }
+                    MatchTwoToken(TokenEnum.IDENT, TokenEnum.NUMBER);
+                }
+                NextToken();
+                sb.Append("};");
+                Console.WriteLine(sb.ToString());
+                emitter.EmitLine(sb.ToString());
+                // from here we have to match the entire string with this rule
+                //[1,a]
+                //number
+                //int variable
+                //sepeated by `,`
+                //`[` and `]` bracket
             }
             //this is not a valid statement Error!
             else
