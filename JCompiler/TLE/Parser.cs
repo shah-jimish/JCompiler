@@ -241,6 +241,13 @@ namespace JCompiler.TLE
                 sb.Append("{");
                 sb.Append(curToken.tokenText.ToString());
                 MatchTwoToken(TokenEnum.IDENT,TokenEnum.NUMBER);
+                if (curToken.tokenKind == TokenEnum.IDENT)
+                {
+                    if (!symbols.Contains(curToken.tokenText.ToString()))
+                    {
+                        Abort("Invalid statement at " + curToken.tokenText.ToString() + " (" + curToken.tokenKind.ToString() + ")");
+                    }
+                }
                 while (!CheckToken(TokenEnum.SBC))
                 {
                     NextToken();
